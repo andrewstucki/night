@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import { connect } from 'react-redux'
 
 import { venues } from '../actions'
+import Venue from '../components/venue'
 
 class ResultsPage extends Component {
   constructor(props) {
@@ -44,19 +45,7 @@ class ResultsPage extends Component {
       <div>
         <input type="text" placeholder="search" value={location} onChange={this.updateLocation} onKeyDown={this.handleInput} />
         <ul>
-          {venues.map(venue => {
-            return (
-              <li key={venue.id}>
-                <a href={venue.url}>{venue.name}</a>
-                { isAuthenticated ?
-                  <span onClick={venue.attendees.indexOf(user.username) === -1 ? attend.bind(this, venue) : unattend.bind(this, venue)}>{venue.attendees.length} attendee(s)</span>
-                  : <span>{venue.attendees.length} attendee(s)</span>
-                }
-                <img src={venue.image} />
-                <span>{venue.snippet}</span>
-              </li>
-            )
-          })}
+          {venues.map(venue => <Venue key={venue.id} venue={venue} user={user} authenticated={isAuthenticated} attend={attend} unattend={unattend} />)}
         </ul>
       </div>
     )

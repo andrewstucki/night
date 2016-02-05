@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 
 export default class Venue extends Component {
-  construtor(props) {
+  constructor(props) {
     super(props)
     this.preventDefault = this.preventDefault.bind(this)
     this.handleAttendance = this.handleAttendance.bind(this)
