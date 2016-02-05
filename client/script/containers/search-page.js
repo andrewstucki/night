@@ -20,7 +20,16 @@ class SearchPage extends Component {
 
   render() {
     const { location } = this.state
-    return <input type="text" placeholder="search" value={location} onChange={this.updateLocation} onKeyDown={this.handleInput} />
+    return (
+      <form className="form-horizontal">
+        <div className="form-group">
+          <label htmlFor="search" className="col-sm-1 col-sm-offset-1 control-label">Location</label>
+          <div className="col-sm-9">
+            <input type="text" placeholder="search" id="search" value={location} onChange={this.updateLocation} onKeyDown={this.handleInput} className="searchbox form-control" />
+          </div>
+        </div>
+      </form>
+    )
   }
 }
 
