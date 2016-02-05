@@ -1,6 +1,6 @@
 {
   "name": "night",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Night app",
   "main": "server/index.js",
   "scripts": {
