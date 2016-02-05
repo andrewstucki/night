@@ -22,11 +22,14 @@ export default class Venue extends Component {
     const { name, attendees, url, image, snippet } = this.props.venue
     const handler = this.props.authenticated ? this.handleAttendance : this.preventDefault
     return (
-      <li>
-        <a href={url}>{name}</a>
-        <span onClick={handler}>{attendees.length} attendee(s)</span>
-        <img src={image} />
-        <span>{snippet}</span>
+      <li className="venue list-group-item row">
+        <div className="col-sm-1 venue-thumbnail">
+          <a href={url}><img src={image} /></a>
+        </div>
+        <div className="col-sm-11">
+          <h4 className="list-group-item-heading"><a href={url}>{name}</a> <span className="label label-warning label-as-badge" onClick={handler}>{attendees.length} <i className="fa fa-check-circle-o"></i></span></h4>
+          <p className="list-group-item-text">{snippet}</p>
+        </div>
       </li>
     )
   }

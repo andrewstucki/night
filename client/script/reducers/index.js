@@ -70,23 +70,24 @@ function cache(state = { users: {}, venues: {}, venuesLoaded: false, usersLoaded
 
 function message(state = null, action) {
   const { type, value, error } = action
-
-  if (type === constants.RESET_MESSAGE || type === "@@reduxReactRouter/routerDidChange") { // reset every route change
-    return null
-  } else if (type === constants.SET_MESSAGE) {
-    return value
-  } else if (type === constants.SIGNUP_SUCCESS || type === constants.RESEND_SUCCESS) {
-    return {
-      type: flash.SUCCESS,
-      message: value.message
-    }
-  } else if (error) {
-    return {
-      type: flash.ERROR,
-      message: error
-    }
+  switch(type) {
+    case constants.RESET_MESSAGE:
+    case "@@reduxReactRouter/routerDidChange":
+      return null
+    case constants.SET_MESSAGE:
+      return value
+    case constants.SIGNUP_SUCCESS:
+    case constants.RESEND_SUCCESS:
+      return {
+        type: flash.SUCCESS,
+        message: value.message
+      }
+    default:
+      if (error) return {
+        type: flash.ERROR,
+        message: error
+      }
   }
-
   return state
 }
 

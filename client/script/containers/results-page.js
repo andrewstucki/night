@@ -43,8 +43,15 @@ class ResultsPage extends Component {
     const unattend = this.unattend
     return (
       <div className="results">
-        <input type="text" placeholder="search" value={location} onChange={this.updateLocation} onKeyDown={this.handleInput} className="searchbox" />
-        <ul>
+        <form className="form-horizontal">
+          <div className="form-group">
+            <label htmlFor="search" className="col-sm-1 col-sm-offset-1 control-label">Location</label>
+            <div className="col-sm-9">
+              <input type="text" placeholder="search" id="search" value={location} onChange={this.updateLocation} onKeyDown={this.handleInput} className="searchbox form-control" />
+            </div>
+          </div>
+        </form>
+        <ul className="list-group">
           {venues.map(venue => <Venue key={venue.id} venue={venue} user={user} authenticated={isAuthenticated} attend={attend} unattend={unattend} />)}
         </ul>
       </div>
