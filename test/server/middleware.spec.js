@@ -5,17 +5,16 @@ import { EventEmitter } from 'events'
 
 import config from '../../server/config'
 import { ModelInvalid, ApiClientFailure } from '../../server/errors'
-import { Poll, User } from '../../server/models'
+import { Venue, User } from '../../server/models'
 import { authenticate } from '../../server/middleware'
 import Factory from './support/factories'
 
 describe('api middleware', () => {
-  afterEach(done => Poll.remove({}).then(() => User.remove({}).then(done.bind(this, null))).catch(done))
+  afterEach(done => Venue.remove({}).then(() => User.remove({}).then(done.bind(this, null))).catch(done))
 
-  it('returns a 401 if there is no x-voting-session header', done => {
+  it('returns a 401 if there is no x-night-session header', done => {
     let req = mocks.createRequest()
     let res = mocks.createResponse({ eventEmitter: EventEmitter })
-
     res.on('end', () => {
       assert.equal(res.statusCode, 401)
       done()
@@ -26,10 +25,10 @@ describe('api middleware', () => {
     })
   })
 
-  it('returns a 401 if the x-voting-session header does not match a user session token', done => {
+  it('returns a 401 if the x-night-session header does not match a user session token', done => {
     let req = mocks.createRequest({
       headers: {
-        'x-voting-session': '1234'
+        'x-night-session': '1234'
       }
     })
     let res = mocks.createResponse({ eventEmitter: EventEmitter })
@@ -44,12 +43,12 @@ describe('api middleware', () => {
     })
   })
 
-  it('calls next if the x-voting-session header matches a user session token', done => {
+  it('calls next if the x-night-session header matches a user session token', done => {
     Factory.create('user', (err, user) => {
       if (err) return done(err)
       let req = mocks.createRequest({
         headers: {
-          'x-voting-session': user.sessionToken
+          'x-night-session': user.sessionToken
         }
       })
       let res = mocks.createResponse({ eventEmitter: EventEmitter })
@@ -69,7 +68,7 @@ describe('api middleware', () => {
       if (err) return done(err)
       let req = mocks.createRequest({
         headers: {
-          'x-voting-session': user.sessionToken
+          'x-night-session': user.sessionToken
         }
       })
       let res = mocks.createResponse({ eventEmitter: EventEmitter })

@@ -7,22 +7,42 @@ var config = {
     db: "mongodb://localhost/night",
     port: 3000,
     redis: 'redis://localhost:6379',
-    baseUrl: 'http://localhost:3000'
+    mandrill_key: process.env.MANDRILL_APIKEY,
+    baseUrl: 'http://localhost:3000',
+    yelp: {
+      consumerKey: process.env.YELP_CONSUMER_KEY,
+      consumerSecret: process.env.YELP_CONSUMER_SECRET,
+      token: process.env.YELP_TOKEN,
+      tokenSecret: process.env.YELP_TOKEN_SECRET
+    }
   },
 
   test: {
     db: "mongodb://localhost/night-test",
     port: 3000,
     redis: 'redis://localhost:6379',
-    baseUrl: 'http://localhost:3000'
+    mandrill_key: process.env.MANDRILL_APIKEY,
+    baseUrl: 'http://localhost:3000',
+    yelp: {
+      consumerKey: process.env.YELP_CONSUMER_KEY,
+      consumerSecret: process.env.YELP_CONSUMER_SECRET,
+      token: process.env.YELP_TOKEN,
+      tokenSecret: process.env.YELP_TOKEN_SECRET
+    }
   },
 
   production: {
-    db: process.env.MONGOLAB_URI || throw new Error("MongoDB required!"),
-    port: process.env.PORT || throw new Error("Port required!"),
-    redis: process.env.REDIS_URL || throw new Error("Redis required!"),
-    mandrill_key: process.env.MANDRILL_APIKEY || throw new Error("Mandrill API key required!"),
-    baseUrl: process.env.BASE_URL || throw new Error("Base URL required!")
+    db: process.env.MONGOLAB_URI,
+    port: process.env.PORT,
+    redis: process.env.REDIS_URL,
+    mandrill_key: process.env.MANDRILL_APIKEY,
+    baseUrl: process.env.BASE_URL,
+    yelp: {
+      consumerKey: process.env.YELP_CONSUMER_KEY,
+      consumerSecret: process.env.YELP_CONSUMER_SECRET,
+      token: process.env.YELP_TOKEN,
+      tokenSecret: process.env.YELP_TOKEN_SECRET
+    }
   }
 };
 

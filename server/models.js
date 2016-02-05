@@ -105,7 +105,6 @@ userSchema.statics.signup = function(username, name, email, password, confirmati
     if (name) params.name = name;
     var user = new schema(params);
     user.save().then(function(user) {
-      socket.addRecord(user.renderJson(), 'users');
       if (!skipEmail) return user.sendConfirmation().then(resolve.bind(this, user)).catch(reject);
       return resolve(user);
     }).catch(function(err) {
@@ -187,9 +186,45 @@ userSchema.methods.sendConfirmation = function() {
 };
 
 userSchema.methods.attend = function(id) {
+  var user = this;
+  return new promise(function(resolve, reject) {
+    Venue.findOne({
+      _id: id
+    }).then(function(venue) {
+      if (!venue) return reject(new errors.NotFound("Unable to find venue"));
+      var index = venue.attendees.indexOf(user._id);
+      if (index !== -1) return reject(new errors.ModelInvalid("Already attending"));
+      venue.attendees.push(user._id);
+      venue.markModified('attendees');
+      venue.save().then(resolve).catch(function(err) {
+        if (err.code === 11000) return reject(new errors.ModelInvalid("Invalid venue"));
+        reject(new errors.DatabaseFailure(err.toString()));
+      })
+    }).catch(function(err) {
+      reject(new errors.DatabaseFailure(err.toString()));
+    });
+  });
 };
 
 userSchema.methods.removeAttend = function(id) {
+  var user = this;
+  return new promise(function(resolve, reject) {
+    Venue.findOne({
+      _id: id
+    }).then(function(venue) {
+      if (!venue) return reject(new errors.NotFound("Unable to find venue"));
+      var index = venue.attendees.indexOf(user._id);
+      if (index === -1) return reject(new errors.ModelInvalid("Not attending"));
+      venue.attendees.splice(index, 1);
+      venue.markModified('attendees');
+      venue.save().then(resolve).catch(function(err) {
+        if (err.code === 11000) return reject(new errors.ModelInvalid("Invalid venue"));
+        reject(new errors.DatabaseFailure(err.toString()));
+      })
+    }).catch(function(err) {
+      reject(new errors.DatabaseFailure(err.toString()));
+    });
+  });
 };
 
 userSchema.methods.renderToken = function() {
@@ -237,10 +272,10 @@ var venueValidators = {};
 
 var venueValidation = function(fields) { return [] };
 var venueSchema = new mongoose.Schema({
-  attendees: [ {
+  attendees: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
   name: {
     type: String,
     required: true
@@ -250,7 +285,7 @@ var venueSchema = new mongoose.Schema({
   },
   image: {
     type: String
-  }
+  },
   snippet: {
     type: String
   }
@@ -267,6 +302,12 @@ venueSchema.methods.renderJson = function() {
     attendees: venue.attendees.map(function(attendee) { return attendee.username; })
   };
   return payload;
+};
+
+venueSchema.static.forLocation = function(location) {
+  return new promise(function(resolve, reject) {
+    return resolve();
+  });
 };
 
 var Venue = mongoose.model('Venue', venueSchema);

@@ -4,14 +4,14 @@ import assert from 'assert'
 
 import config from '../../../server/config'
 import email from '../../../server/workers/email'
-import { User, Poll } from '../../../server/models'
+import { User, Venue } from '../../../server/models'
 
 import Factory from '../support/factories'
 
 require('../support/setup')
 
 describe('api email worker', () => {
-  afterEach(done => Poll.remove({}).then(() => User.remove({}).then(done.bind(this, null))).catch(done))
+  afterEach(done => Venue.remove({}).then(() => User.remove({}).then(done.bind(this, null))).catch(done))
 
   it('calls the callback with errors when mandrill returns an error', done => {
     let mandrill = nock('https://mandrillapp.com')

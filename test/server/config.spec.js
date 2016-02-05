@@ -3,10 +3,10 @@ import assert from 'assert'
 describe('api config', () => {
   it('defaults the environment to development', done => {
     delete require.cache[require.resolve('../../server/config')]
-    delete process.env['ENVIRONMENT']
+    delete process.env['NODE_ENV']
     let config = require('../../server/config')
     delete require.cache[require.resolve('../../server/config')]
-    process.env['ENVIRONMENT'] = 'test'
+    process.env['NODE_ENV'] = 'test'
     require('../../server/config')
 
     assert.equal("development", config.environment)
@@ -15,10 +15,10 @@ describe('api config', () => {
 
   it('contains configuration for database and ports and the environment name for development', done => {
     delete require.cache[require.resolve('../../server/config')]
-    process.env['ENVIRONMENT'] = 'development'
+    process.env['NODE_ENV'] = 'development'
     let config = require('../../server/config')
     delete require.cache[require.resolve('../../server/config')]
-    process.env['ENVIRONMENT'] = 'test'
+    process.env['NODE_ENV'] = 'test'
     require('../../server/config')
 
     assert(config.hasOwnProperty('db'), 'Configuration does not contain db field')

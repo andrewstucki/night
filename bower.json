@@ -1,6 +1,6 @@
 {
-  "name": "voting",
-  "description": "voting app",
+  "name": "night",
+  "description": "night app",
   "main": "server/index.js",
   "authors": [
     "Andrew Stucki <andrew.stucki@govdelivery.com>"

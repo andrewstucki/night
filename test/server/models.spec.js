@@ -2,10 +2,8 @@ import request from 'supertest'
 import assert from 'assert'
 import mongoose from 'mongoose'
 
-if (process.env.NODE_ENV !== "test") throw new Error('Run the tests using the test environment flag')
-
 import config from '../../server/config'
-import { User, Poll } from '../../server/models'
+import { User, Venue } from '../../server/models'
 import { ModelInvalid, ApiClientFailure, NotFound } from '../../server/errors'
 import queue from '../../server/queue'
 import Factory from './support/factories'
@@ -16,7 +14,7 @@ describe('api models', () => {
   describe('User', () => {
     afterEach(done => {
       queue.testMode.clear()
-      Poll.remove({}).then(() => User.remove({}).then(done.bind(this, null))).catch(done)
+      Venue.remove({}).then(() => User.remove({}).then(done.bind(this, null))).catch(done)
     })
 
     it('clears the session token on logout', done => {

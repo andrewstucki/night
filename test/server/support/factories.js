@@ -2,7 +2,7 @@ import Factory from 'factory-girl'
 import hat from 'hat'
 import mongoose from 'mongoose'
 
-import { User } from '../../../server/models'
+import { User, Venue } from '../../../server/models'
 
 Factory.define('user', User, {
   email: Factory.sequence(n => `user${n}@example.com`),
@@ -12,6 +12,14 @@ Factory.define('user', User, {
   confirmed: true,
   confirmationToken: () => hat(),
   sessionToken: () => hat()
+})
+
+Factory.define('venue', Venue, {
+  attendees: [],
+  name: Factory.sequence(n => `Venue ${n}`),
+  url: Factory.sequence(n => `http://www.test${n}.com`),
+  image: Factory.sequence(n => `http://www.test${n}.com/image.jpg`),
+  snippet: 'I love this place!'
 })
 
 export default Factory

@@ -127,7 +127,7 @@ router.post("/signup", jsonParser, function(req, res) {
 
 // venues
 router.get('/find/:location', function(req, res) {
-  Venue.forLocation(req.params.location).then(function(venues) {
+  models.Venue.forLocation(req.params.location).then(function(venues) {
     return res.status(200).json(_.map(venues, function(venue) {
       return venue.renderJson();
     }));
@@ -136,13 +136,13 @@ router.get('/find/:location', function(req, res) {
 
 router.post('/venues/:id', middleware.authenticate, function(req, res) {
   req.user.attend(req.params.id).then(function() {
-    return res.status(201).send({});
+    return res.status(201).json({});
   }).catch(handleError.bind(this, res));
 });
 
 router.delete('/venues/:id', middleware.authenticate, function(req, res) {
   req.user.removeAttend(req.params.id).then(function() {
-    return res.status(202).send({});
+    return res.status(202).json({});
   }).catch(handleError.bind(this, res));
 });
 
