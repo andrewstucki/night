@@ -9,19 +9,25 @@ import { api } from './actions'
 import Socket from './utils/socket'
 
 if (process.env.NODE_ENV === 'production' && window.location.protocol !== "https:") window.location.href = `https:${window.location.href.substring(window.location.protocol.length)}`
-if (process.env.NODE_ENV !== 'production') document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js"></' + 'script>')
+if (process.env.NODE_ENV !== 'production') document.write('<script src="http://' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js"></' + 'script>')
+
+const token = localStorage.getItem("token")
+const location = localStorage.getItem("location")
 
 function initializeApplication(user) {
   let store
   if (user) {
     store = configureStore({
-      auth: { isAuthenticated: true, user: Object.assign({}, user, { polls: [] }) },
+      location,
+      auth: { isAuthenticated: true, user: user },
     })
   } else {
-    store = configureStore()
+    store = configureStore({
+      location
+    })
   }
 
-  const socket = new Socket(location.host || 'localhost', store)
+  const socket = new Socket(window.location.host || 'localhost', store)
 
   render(
     <Root store={store} />,
@@ -29,5 +35,4 @@ function initializeApplication(user) {
   )
 }
 
-const token = localStorage.getItem("token")
 api('/profile', { authentication: token }).then(initializeApplication).catch(err => initializeApplication())

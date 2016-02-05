@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { IndexLink, Link } from 'react-router'
-import { NavDropdown, MenuItem } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
 import { flash, auth } from '../actions'
 
 import NavLink from '../components/nav-link'
@@ -48,50 +46,6 @@ class App extends Component {
     )
   }
 
-  header() {
-    if (this.props.url === "") {
-      return (
-        <header className="hero-unit" id="banner">
-          <div className="container">
-            <div>
-              <h1>Voting</h1>
-              <p className="lead">Create custom polls with live results.</p>
-              <Link to='/signup'>
-                <button className="btn btn-lg btn-success main-signup">Sign Up</button>
-              </Link>
-            </div>
-            <div className="hide">
-              <h1>Dashboard</h1>
-              <p className="lead">What would you like to do today?</p>
-              <button className="btn btn-lg btn-success">New Poll</button>
-              <button className="btn btn-lg btn-primary">My Polls</button>
-            </div>
-          </div>
-        </header>
-      )
-    }
-    return ""
-  }
-
-  leftNavbar() {
-    let admin = ""
-    if (this.props.isAuthenticated) {
-      admin = (
-        <NavDropdown eventKey={3} title="Admin" id="basic-nav-dropdown">
-          <LinkContainer to='/new'><MenuItem eventKey={3.1}>New Poll</MenuItem></LinkContainer>
-          <LinkContainer to='/profile'><MenuItem eventKey={3.2}>Profile</MenuItem></LinkContainer>
-        </NavDropdown>
-      )
-    }
-    return (
-      <ul className="nav navbar-nav">
-        <NavLink to='/users'>Users</NavLink>
-        <NavLink to='/polls'>Polls</NavLink>
-        {admin}
-      </ul>
-    )
-  }
-
   rightNavbar() {
     if (!this.props.isAuthenticated) {
       return (
@@ -129,16 +83,14 @@ class App extends Component {
                 <span className="icon-bar"></span>
                 <span className="icon-bar"></span>
               </button>
-              <IndexLink className="navbar-brand" to={linkTo}>Voting</IndexLink>
+              <IndexLink className="navbar-brand" to={linkTo}>Night</IndexLink>
             </div>
             <div className="navbar-collapse collapse" id="navbar-main">
-              {this.leftNavbar()}
               {this.rightNavbar()}
             </div>
           </div>
         </div>
         {this.renderMessage()}
-        {this.header()}
         <div className="container main-container">
           <div className="row">
             {children}
@@ -156,7 +108,6 @@ App.propTypes = {
     message: PropTypes.string
   }),
   resetMessage: PropTypes.func.isRequired,
-  url: PropTypes.string.isRequired,
   // Injected by React Router
   children: PropTypes.node
 }
@@ -165,8 +116,7 @@ function mapStateToProps(state) {
   return {
     flash: state.message,
     isAuthenticated: state.auth.isAuthenticated,
-    currentUser: state.auth.user,
-    url: state.router.location.pathname.substring(1)
+    currentUser: state.auth.user
   }
 }
 

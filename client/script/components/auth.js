@@ -40,7 +40,7 @@ export function requireAuth(Component) {
 export function noAuth(Component) {
   return generateAuthWrapper(Component, function(props) {
     if (props.isAuthenticated) {
-      props.dispatch(pushState(null, '/profile'))
+      props.dispatch(pushState(null, '/'))
     }
   }, function(props) {
     return !props.isAuthenticated

@@ -42,15 +42,6 @@ class LoginPage extends Component {
   }
 }
 
-// <div className="form-buttons">
-//   <button className="btn btn-block btn-success" type="submit" onClick={this.doLogin}>Submit</button>
-//   <hr/>
-//   <button className="btn btn-block btn-facebook">Log in via Facebook <i className="fa fa-facebook-official"></i></button>
-//   <button className="btn btn-block btn-google">Log in via Google <i className="fa fa-google"></i></button>
-//   <button className="btn btn-block btn-github">Log in via GitHub <i className="fa fa-github"></i></button>
-//   <button className="btn btn-block btn-twitter">Log in via Twitter <i className="fa fa-twitter"></i></button>
-// </div>
-
 export default connect(null, {
   login: auth.login,
   setMessage: flash.setMessage

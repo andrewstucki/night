@@ -4,6 +4,9 @@ var promise = require('promise');
 var hat = require('hat');
 var _ = require('underscore');
 var md5 = require('md5');
+var Yelp = require('yelp');
+var tz = require("tz-lookup");
+var moment = require('moment-timezone');
 
 var config = require("./config");
 var errors = require("./errors");
@@ -13,6 +16,23 @@ var socket = require("./socket");
 // initialize mongo
 mongoose.Promise = promise;
 mongoose.connect(config.db);
+
+var yelp = new Yelp({
+  consumer_key: config.yelp.consumerKey,
+  consumer_secret: config.yelp.consumerSecret,
+  token: config.yelp.token,
+  token_secret: config.yelp.tokenSecret,
+});
+
+//queue
+var seconds = 1000;
+var minutes = 60 * seconds;
+queue.process('clear-venues', function (job, done) {
+  var requeue = function() {
+    queue.create('clear-venues').delay(30*minutes).save();
+  };
+  Venue.remove({expires: {$lt: moment()}}).then(requeue).catch(requeue);
+});
 
 // Users
 var userSchema = new mongoose.Schema({
@@ -196,7 +216,12 @@ userSchema.methods.attend = function(id) {
       if (index !== -1) return reject(new errors.ModelInvalid("Already attending"));
       venue.attendees.push(user._id);
       venue.markModified('attendees');
-      venue.save().then(resolve).catch(function(err) {
+      venue.save().then(function(updated) {
+        Venue.populate(updated, {path:"attendees"}).then(function(updated) {
+          socket.updateVenue(updated.renderJson());
+          resolve(updated);
+        }).catch(reject);
+      }).catch(function(err) {
         if (err.code === 11000) return reject(new errors.ModelInvalid("Invalid venue"));
         reject(new errors.DatabaseFailure(err.toString()));
       })
@@ -217,7 +242,12 @@ userSchema.methods.removeAttend = function(id) {
       if (index === -1) return reject(new errors.ModelInvalid("Not attending"));
       venue.attendees.splice(index, 1);
       venue.markModified('attendees');
-      venue.save().then(resolve).catch(function(err) {
+      venue.save().then(function(updated) {
+        Venue.populate(updated, {path:"attendees"}).then(function(updated) {
+          socket.updateVenue(updated.renderJson());
+          resolve(updated);
+        }).catch(reject);
+      }).catch(function(err) {
         if (err.code === 11000) return reject(new errors.ModelInvalid("Invalid venue"));
         reject(new errors.DatabaseFailure(err.toString()));
       })
@@ -268,9 +298,6 @@ userSchema.pre('save', function(next) {
 
 // Venues
 
-var venueValidators = {};
-
-var venueValidation = function(fields) { return [] };
 var venueSchema = new mongoose.Schema({
   attendees: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -288,6 +315,18 @@ var venueSchema = new mongoose.Schema({
   },
   snippet: {
     type: String
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  timezone: {
+    type: String,
+    required: true
+  },
+  expires: {
+    type: Date,
+    required: true
   }
 });
 
@@ -298,15 +337,37 @@ venueSchema.methods.renderJson = function() {
     name: venue.name,
     url: venue.url,
     image: venue.image,
-    snipped: venue.snippet,
+    snippet: venue.snippet,
+    timezone: venue.timezone,
+    location: venue.location,
     attendees: venue.attendees.map(function(attendee) { return attendee.username; })
   };
   return payload;
 };
 
-venueSchema.static.forLocation = function(location) {
+venueSchema.statics.forLocation = function(location) {
+  var schema = this;
   return new promise(function(resolve, reject) {
-    return resolve();
+    schema.find({ location }).populate('attendees').then(function(venues) {
+      if (venues.length > 0) return resolve(venues);
+      yelp.search({ term: 'dinner', location }).then(function (data) {
+        var venues = _.map(data.businesses, function(business) {
+          var timezone = tz(business.location.coordinate.latitude, business.location.coordinate.longitude);
+          var tomorrow = moment().tz(timezone).add(1, 'days').startOf("day");
+          return {
+            attendees: [],
+            name: business.name,
+            url: business.url.split("?")[0],
+            image: business.image_url,
+            snippet: business.snippet_text,
+            timezone: timezone,
+            location: location,
+            expires: moment(tomorrow).toDate()
+          }
+        });
+        schema.insertMany(venues).then(resolve).catch(reject);
+      }).catch(reject);
+    }).catch(reject);
   });
 };
 

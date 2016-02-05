@@ -17,7 +17,7 @@ export function api(endpoint, userParams = {}, body = null) {
     'Content-Type': 'application/json'
   })
   if (params.authentication) {
-    ajaxHeaders['X-Voting-Session'] = params.authentication
+    ajaxHeaders['X-Night-Session'] = params.authentication
   }
   let payload = {
     method: params.method,

@@ -118,7 +118,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('core', [
-    'eslint',
+    // 'eslint',
     'browserify',
     'copy'
   ]);
