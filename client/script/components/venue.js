@@ -13,6 +13,7 @@ export default class Venue extends Component {
 
   handleAttendance(e) {
     e.preventDefault()
+    if (!this.props.user.confirmed) return
     if (this.props.venue.attendees.indexOf(this.props.user.username) === -1) return this.props.attend(this.props.venue)
     return this.props.unattend(this.props.venue)
   }

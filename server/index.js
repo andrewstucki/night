@@ -21,7 +21,7 @@ var email = require('./workers/email');
 queue.process('email', email);
 
 app.use(express.static('public'));
-app.get(/^\/(login|signup).*/, function(req, res) {
+app.get(/^\/(login|signup|resend).*/, function(req, res) {
   res.sendFile(path.resolve(__dirname + '/../public/index.html'));
 });
 
@@ -77,13 +77,13 @@ router.post("/session", jsonParser, function(req, res) {
   }).catch(handleError.bind(this, res));
 });
 
-router.delete("/session", middleware.authenticate, function(req, res) {
+router.delete("/session", middleware.authenticate(), function(req, res) {
   req.user.logout().then(function(user) {
     return res.status(202).send({});
   }).catch(handleError.bind(this, res));
 });
 
-router.get("/profile", middleware.authenticate, function(req, res) {
+router.get("/profile", middleware.authenticate(), function(req, res) {
   return res.status(200).json(req.user.renderToken());
 });
 
@@ -108,7 +108,7 @@ router.get("/confirm/:token", function(req, res) {
   }).catch(handleError.bind(this, res));
 });
 
-router.post("/confirm/resend", middleware.authenticate, function(req, res) {
+router.post("/confirm/resend", middleware.authenticate(false), function(req, res) {
   req.user.sendConfirmation().then(function() {
     return res.status(201).json({
       message: "Confirmation message sent to: " + req.user.email
@@ -134,13 +134,13 @@ router.get('/find/:location', function(req, res) {
   }).catch(handleError.bind(this, res));
 });
 
-router.post('/venues/:id', middleware.authenticate, function(req, res) {
+router.post('/venues/:id', middleware.authenticate(true), function(req, res) {
   req.user.attend(req.params.id).then(function() {
     return res.status(201).json({});
   }).catch(handleError.bind(this, res));
 });
 
-router.delete('/venues/:id', middleware.authenticate, function(req, res) {
+router.delete('/venues/:id', middleware.authenticate(true), function(req, res) {
   req.user.removeAttend(req.params.id).then(function() {
     return res.status(202).json({});
   }).catch(handleError.bind(this, res));

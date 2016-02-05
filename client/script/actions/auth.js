@@ -27,3 +27,12 @@ export function signup(username, name, email, password, confirmation) {
       .catch(err => handleError(dispatch, Constants.SIGNUP_FAILURE, err))
   }
 }
+
+export function resend() {
+  return (dispatch, getState) => {
+    dispatch({ type: Constants.RESEND_REQUEST })
+    return api('/confirm/resend', { method: "post", authentication: getState().auth.user.token })
+      .then(json => dispatch({ type: Constants.RESEND_SUCCESS, value: json }))
+      .catch(err => handleError(dispatch, Constants.RESEND_FAILURE, err))
+  }
+}

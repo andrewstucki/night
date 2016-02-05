@@ -42,8 +42,8 @@ class ResultsPage extends Component {
     const attend = this.attend
     const unattend = this.unattend
     return (
-      <div>
-        <input type="text" placeholder="search" value={location} onChange={this.updateLocation} onKeyDown={this.handleInput} />
+      <div className="results">
+        <input type="text" placeholder="search" value={location} onChange={this.updateLocation} onKeyDown={this.handleInput} className="searchbox" />
         <ul>
           {venues.map(venue => <Venue key={venue.id} venue={venue} user={user} authenticated={isAuthenticated} attend={attend} unattend={unattend} />)}
         </ul>

@@ -20,20 +20,22 @@ function generateAuthWrapper(Component, authCheck, renderCheck) {
   }
 
   const mapStateToProps = (state) => ({
-    isAuthenticated: state.auth.isAuthenticated
+    isAuthenticated: state.auth.isAuthenticated,
+    user: state.auth.user
   })
 
   return connect(mapStateToProps)(AuthenticatedComponent)
 }
 
-export function requireAuth(Component) {
+export function requireAuth(Component, confirmation) {
   return generateAuthWrapper(Component, function(props) {
-    if (!props.isAuthenticated) {
+    if (!props.isAuthenticated && ((typeof confirmation === 'undefined') || (confirmation && !props.user.confirmed))) {
       let redirectAfterLogin = props.location.pathname
       props.dispatch(pushState(null, `/login`))
     }
   }, function(props) {
-    return props.isAuthenticated
+    if (typeof confirmation === 'undefined') return props.isAuthenticated
+    return props.isAuthenticated && (!confirmation || props.user.confirmed)
   })
 }
 

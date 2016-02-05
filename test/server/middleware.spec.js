@@ -20,7 +20,7 @@ describe('api middleware', () => {
       done()
     })
 
-    authenticate(req, res, () => {
+    authenticate()(req, res, () => {
       throw new Error('unreachable')
     })
   })
@@ -38,7 +38,7 @@ describe('api middleware', () => {
       done()
     })
 
-    authenticate(req, res, () => {
+    authenticate()(req, res, () => {
       throw new Error('unreachable')
     })
   })
@@ -57,7 +57,7 @@ describe('api middleware', () => {
         done(new Error('unreachable'))
       })
 
-      authenticate(req, res, () => {
+      authenticate()(req, res, () => {
         done()
       })
     })
@@ -78,8 +78,90 @@ describe('api middleware', () => {
         done()
       })
 
-      authenticate(req, res, () => {
+      authenticate()(req, res, () => {
         throw new Error('simulated exception')
+      })
+    })
+  })
+
+  it('calls next if the x-night-session header matches a user session token which is confirmed', done => {
+    Factory.create('user', {confirmed: true}, (err, user) => {
+      if (err) return done(err)
+      let req = mocks.createRequest({
+        headers: {
+          'x-night-session': user.sessionToken
+        }
+      })
+      let res = mocks.createResponse({ eventEmitter: EventEmitter })
+
+      res.on('end', () => {
+        done(new Error('unreachable'))
+      })
+
+      authenticate(true)(req, res, () => {
+        done()
+      })
+    })
+  })
+
+  it('returns a 401 if x-night-session header matches a user session token which is confirmed', done => {
+    Factory.create('user', {confirmed: true}, (err, user) => {
+      if (err) return done(err)
+      let req = mocks.createRequest({
+        headers: {
+          'x-night-session': user.sessionToken
+        }
+      })
+      let res = mocks.createResponse({ eventEmitter: EventEmitter })
+
+      res.on('end', () => {
+        assert.equal(res.statusCode, 401)
+        done()
+      })
+
+      authenticate(false)(req, res, () => {
+        done(new Error('unreachable'))
+      })
+    })
+  })
+
+  it('calls next if the x-night-session header matches a user session token which is unconfirmed', done => {
+    Factory.create('user', {confirmed: false}, (err, user) => {
+      if (err) return done(err)
+      let req = mocks.createRequest({
+        headers: {
+          'x-night-session': user.sessionToken
+        }
+      })
+      let res = mocks.createResponse({ eventEmitter: EventEmitter })
+
+      res.on('end', () => {
+        done(new Error('unreachable'))
+      })
+
+      authenticate(false)(req, res, () => {
+        done()
+      })
+    })
+  })
+
+  it('returns a 401 if x-night-session header matches a user session token which is unconfirmed', done => {
+    Factory.create('user', {confirmed: false}, (err, user) => {
+      if (err) return done(err)
+      let req = mocks.createRequest({
+        headers: {
+          'x-night-session': user.sessionToken
+        }
+      })
+      let res = mocks.createResponse({ eventEmitter: EventEmitter })
+
+      res.on('end', () => {
+        assert.equal(res.statusCode, 401)
+        done()
+      })
+
+      authenticate(true)(req, res, () => {
+        done(new Error('unreachable'))
       })
     })
   })

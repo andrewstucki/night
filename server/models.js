@@ -264,6 +264,7 @@ userSchema.methods.renderToken = function() {
     name: this.name,
     gravatarUrl: this.gravatarUrl,
     email: this.email,
+    confirmed: this.confirmed,
     token: this.sessionToken
   };
 };

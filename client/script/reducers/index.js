@@ -75,7 +75,7 @@ function message(state = null, action) {
     return null
   } else if (type === constants.SET_MESSAGE) {
     return value
-  } else if (type === constants.SIGNUP_SUCCESS) {
+  } else if (type === constants.SIGNUP_SUCCESS || type === constants.RESEND_SUCCESS) {
     return {
       type: flash.SUCCESS,
       message: value.message
